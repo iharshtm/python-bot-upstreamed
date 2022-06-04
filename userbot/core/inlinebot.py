@@ -91,7 +91,7 @@ def main_menu():
 
 
 def article_builder(event, method):
-    media = None
+    media = type = photo = None
     link_preview = False
     builder = event.builder
     title = "Cat Userbot"
@@ -174,16 +174,13 @@ def article_builder(event, method):
             buttons=buttons,
         )
     else:
-        photo = (
-            types.InputWebDocument(
-                url=media, size=0, mime_type="image/jpeg", attributes=[]
-            )
-            if media
-            else None
-        )
+        if media and media.endswith((".jpg", ".jpeg", ".png")):
+            photo = types.InputWebDocument(url=media, size=0, mime_type="image/jpeg", attributes=[])
+            type = "photo"
         result = builder.article(
             title=title,
             description=description,
+            type=type,
             file=media,
             thumb=photo,
             content=photo,
