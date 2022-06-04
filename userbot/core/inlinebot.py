@@ -167,14 +167,20 @@ def article_builder(event, method):
         buttons = ibuild_keyboard(buttons_list)
     if media and not media.endswith((".jpg", ".jpeg", ".png")):
         result = builder.document(
-        media,
-        title=title,
-        description=description,
-        text=query,
-        buttons=buttons,
-    )
+            media,
+            title=title,
+            description=description,
+            text=query,
+            buttons=buttons,
+        )
     else:
-        photo = types.InputWebDocument(url=media, size=0, mime_type="image/jpeg", attributes=[]) if media else None
+        photo = (
+            types.InputWebDocument(
+                url=media, size=0, mime_type="image/jpeg", attributes=[]
+            )
+            if media
+            else None
+        )
         result = builder.article(
             title=title,
             description=description,
@@ -183,8 +189,8 @@ def article_builder(event, method):
             content=photo,
             text=query,
             buttons=buttons,
-            link_preview=link_preview
-    )
+            link_preview=link_preview,
+        )
     return result
 
 
