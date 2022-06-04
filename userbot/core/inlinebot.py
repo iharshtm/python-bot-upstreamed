@@ -43,8 +43,7 @@ def getkey(val):
     return None
 
 def get_thumb(name):
-    url = f"https://github.com/TgCatUB/CatUserbot-Resources/blob/master/Resources/Inline/{name}.png?raw=true"
-    return types.InputWebDocument(url=url, size=0, mime_type="image/png", attributes=[])
+    return f"https://github.com/TgCatUB/CatUserbot-Resources/blob/master/Resources/Inline/{name}.png?raw=true"
     
 def ibuild_keyboard(buttons):
     keyb = []
@@ -595,7 +594,7 @@ async def inline_handler(event):  # sourcery no-metrics
                     title="Troll",
                     description="Send troll message to your friends",
                     text="__Send troll message which everyone can see except the reciver..__",
-                    thumb = thumb = get_thumb("troll"),
+                    thumb = get_thumb("troll"),
                     buttons=[
                         Button.switch_inline(
                             "Troll Text", query="troll @username Text", same_peer=True
