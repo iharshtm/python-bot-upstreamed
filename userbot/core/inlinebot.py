@@ -176,7 +176,9 @@ def article_builder(event, method):
     else:
         type = "article"
         if media and media.endswith((".jpg", ".jpeg", ".png")):
-            photo = types.InputWebDocument(url=media, size=0, mime_type="image/jpeg", attributes=[])
+            photo = types.InputWebDocument(
+                url=media, size=0, mime_type="image/jpeg", attributes=[]
+            )
             type = "photo"
         result = builder.article(
             title=title,
