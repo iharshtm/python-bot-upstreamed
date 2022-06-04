@@ -42,7 +42,9 @@ def getkey(val):
                 return key
     return None
 
-
+def get_thumb(name):
+    return f"https://github.com/TgCatUB/CatUserbot-Resources/blob/master/Resources/Inline/{name}.png?raw=true"
+    
 def ibuild_keyboard(buttons):
     keyb = []
     for btn in buttons:
@@ -91,7 +93,7 @@ def main_menu():
 
 
 def article_builder(event, method):
-    media = photo = None
+    media = thumb = photo = None
     link_preview = False
     builder = event.builder
     title = "Cat Userbot"
@@ -100,6 +102,7 @@ def article_builder(event, method):
         help_info = main_menu()
         title = "© CatUserbot Help"
         description = "Help menu for CatUserbot"
+        thumb = get_thumb("help")
         query = help_info[0]
         buttons = help_info[1]
     elif method == "pmpermit":
@@ -174,18 +177,18 @@ def article_builder(event, method):
             buttons=buttons,
         )
     else:
-        # type = "article"
+        type = "article"
         if media and media.endswith((".jpg", ".jpeg", ".png")):
             photo = types.InputWebDocument(
                 url=media, size=0, mime_type="image/jpeg", attributes=[]
             )
-            # type = "photo"
+            type = "photo"
         result = builder.article(
             title=title,
             description=description,
-            # type=type,
+            type=type,
             file=media,
-            thumb=photo,
+            thumb= thumb if thumb else photo,
             content=photo,
             text=query,
             buttons=buttons,
@@ -578,6 +581,7 @@ async def inline_handler(event):  # sourcery no-metrics
                     title="Secret",
                     description="Send secret message to your friends",
                     text="__Send secret message which only you & the reciver can see..__",
+                    thumb = get_thumb("secret"),
                     buttons=[
                         Button.switch_inline(
                             "Secret Text", query="secret @username Text", same_peer=True
@@ -590,6 +594,7 @@ async def inline_handler(event):  # sourcery no-metrics
                     title="Troll",
                     description="Send troll message to your friends",
                     text="__Send troll message which everyone can see except the reciver..__",
+                    thumb = thumb = get_thumb("troll"),
                     buttons=[
                         Button.switch_inline(
                             "Troll Text", query="troll @username Text", same_peer=True
@@ -602,6 +607,7 @@ async def inline_handler(event):  # sourcery no-metrics
                     title="Hide",
                     description="Send hidden text in chat",
                     text="__Send hidded message to save from being quote..__",
+                    thumb = get_thumb("hide"),
                     buttons=[
                         Button.switch_inline(
                             "Hidden Text", query="hide Text", same_peer=True
@@ -614,6 +620,7 @@ async def inline_handler(event):  # sourcery no-metrics
                     title="Youtube Download",
                     description="Download videos from YouTube",
                     text="__Download videos or audio from YouTube with different option of resolution..__",
+                    thumb = get_thumb("youtube"),
                     buttons=[
                         Button.switch_inline(
                             "Youtube-dl", query="ytdl perfect", same_peer=True
