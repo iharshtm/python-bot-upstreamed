@@ -43,7 +43,8 @@ def getkey(val):
     return None
 
 def get_thumb(name):
-    return f"https://github.com/TgCatUB/CatUserbot-Resources/blob/master/Resources/Inline/{name}.png?raw=true"
+    url = f"https://github.com/TgCatUB/CatUserbot-Resources/blob/master/Resources/Inline/{name}.png?raw=true"
+    return types.InputWebDocument(url=url, size=0, mime_type="image/png", attributes=[])
     
 def ibuild_keyboard(buttons):
     keyb = []
