@@ -165,36 +165,26 @@ def article_builder(event, method):
             note_data += markdown_note[prev:]
         query = note_data.strip()
         buttons = ibuild_keyboard(buttons_list)
-    if media and media.endswith((".jpg", ".jpeg", ".png")):
-        photo = types.InputWebDocument(
-            url=media, size=0, mime_type="image/jpeg", attributes=[]
-        )
+    if media and not media.endswith((".jpg", ".jpeg", ".png")):
+        result = builder.document(
+        media,
+        title=title,
+        description=description,
+        text=query,
+        buttons=buttons,
+    )
+    else:
+        photo = types.InputWebDocument(url=media, size=0, mime_type="image/jpeg", attributes=[]) if media else None
         result = builder.article(
             title=title,
             description=description,
-            type="photo",
             file=media,
             thumb=photo,
             content=photo,
             text=query,
             buttons=buttons,
-        )
-    elif media:
-        result = builder.document(
-            media,
-            title=title,
-            description=description,
-            text=query,
-            buttons=buttons,
-        )
-    else:
-        result = builder.article(
-            title=title,
-            description=description,
-            text=query,
-            buttons=buttons,
-            link_preview=link_preview,
-        )
+            link_preview=link_preview
+    )
     return result
 
 
