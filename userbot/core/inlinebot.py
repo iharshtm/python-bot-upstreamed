@@ -90,7 +90,7 @@ def main_menu():
     return text, buttons
 
 
-async def article_builder(event, method):
+def article_builder(event, method):
     media = None
     link_preview = False
     builder = event.builder
@@ -165,14 +165,33 @@ async def article_builder(event, method):
             note_data += markdown_note[prev:]
         query = note_data.strip()
         buttons = ibuild_keyboard(buttons_list)
-    result = builder.article(
-        title=title,
-        file=media,
-        description=description,
-        text=query,
-        buttons=buttons,
-        link_preview=link_preview,
-    )
+    if media and media.endswith((".jpg", ".jpeg", ".png")):
+        photo = types.InputWebDocument(url=media, size=0, mime_type="image/jpeg", attributes=[])
+        result = builder.article(
+            title="𝘾𝙖𝙩𝙐𝙨𝙚𝙧𝙗𝙤𝙩",
+            description="Deploy yourself",
+            type="photo",
+            thumb=photo,
+            content=photo,
+            text=query,
+            buttons=buttons,
+        )
+    elif media:
+        result = builder.document(
+            media,
+            title=title,
+            description=description,
+            text=query,
+            buttons=buttons,
+        )
+    else:
+        result = builder.article(
+            title=title,
+            description=description,
+            text=query,
+            buttons=buttons,
+            link_preview=link_preview,
+        )
     return result
 
 
@@ -321,10 +340,10 @@ async def inline_handler(event):  # sourcery no-metrics
         hid = re.compile("hide (.*)")
         match3 = re.findall(hid, query)
         if string == "ialive":
-            result = await article_builder(event, string)
+            result = article_builder(event, string)
             await event.answer([result] if result else None)
         elif query.startswith("Inline buttons"):
-            result = await article_builder(event, query)
+            result = article_builder(event, query)
             await event.answer([result] if result else None)
         elif match:
             query = query[7:]
@@ -450,7 +469,7 @@ async def inline_handler(event):  # sourcery no-metrics
             else:
                 json.dump(newhide, open(hide, "w"))
         elif string == "help":
-            result = await article_builder(event, string)
+            result = article_builder(event, string)
             await event.answer([result] if result else None)
         elif str_y[0].lower() == "ytdl" and len(str_y) == 2:
             link = get_yt_video_id(str_y[1].strip())
@@ -547,13 +566,13 @@ async def inline_handler(event):  # sourcery no-metrics
             )
             await event.answer([result] if result else None)
         elif string == "pmpermit":
-            result = await article_builder(event, string)
+            result = article_builder(event, string)
             await event.answer([result] if result else None)
         elif string == "":
             results = []
-            alive_menu = await article_builder(event, "ialive")
+            alive_menu = article_builder(event, "ialive")
             results.append(alive_menu) if alive_menu else None
-            help_menu = await article_builder(event, "help")
+            help_menu = article_builder(event, "help")
             results.append(help_menu) if help_menu else None
             results.append(
                 builder.article(
