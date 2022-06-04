@@ -167,9 +167,9 @@ def article_builder(event, method):
         buttons = ibuild_keyboard(buttons_list)
     result = builder.article(
         title=title,
+        file=media,
         description=description,
         text=query,
-        content=media,
         buttons=buttons,
         link_preview=link_preview,
     )
