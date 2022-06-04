@@ -166,7 +166,9 @@ def article_builder(event, method):
         query = note_data.strip()
         buttons = ibuild_keyboard(buttons_list)
     if media and media.endswith((".jpg", ".jpeg", ".png")):
-        photo = types.InputWebDocument(url=media, size=0, mime_type="image/jpeg", attributes=[])
+        photo = types.InputWebDocument(
+            url=media, size=0, mime_type="image/jpeg", attributes=[]
+        )
         result = builder.article(
             title="𝘾𝙖𝙩𝙐𝙨𝙚𝙧𝙗𝙤𝙩",
             description="Deploy yourself",
