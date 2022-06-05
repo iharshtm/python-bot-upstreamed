@@ -31,7 +31,6 @@ LOGS = logging.getLogger(__name__)
 
 BTN_URL_REGEX = re.compile(r"(\[([^\[]+?)\]\<buttonurl:(?:/{0,2})(.+?)(:same)?\>)")
 MEDIA_PATH_REGEX = re.compile(r"(:?\<\bmedia:(:?(?:.*?)+)\>)")
-CATLOGO = "https://telegra.ph/file/493268c1f5ebedc967eba.jpg"
 tr = Config.COMMAND_HAND_LER
 
 
@@ -77,25 +76,25 @@ def main_menu():
         ),
         (
             Button.inline(f"➕ Extra ({len(GRP_INFO['extra'])})", data="extra_menu"),
-            Button.inline(
-                f"⚰️ Useless ({len(GRP_INFO['useless'])})", data="useless_menu"
-            ),
+            Button.inline("🔒 Close Menu", data="close"),
         ),
-        (Button.inline("🔒 Close Menu", data="close"),),
     ]
-    if not Config.BADCAT:
+    if Config.BADCAT:
         switch_button = [
             (
                 Button.inline(f"➕ Extra ({len(GRP_INFO['extra'])})", data="extra_menu"),
-                Button.inline("🔒 Close Menu", data="close"),
+                Button.inline(
+                    f"⚰️ Useless ({len(GRP_INFO['useless'])})", data="useless_menu"
+                ),
             ),
+            (Button.inline("🔒 Close Menu", data="close"),),
         ]
-        buttons = buttons[:-2] + switch_button
+        buttons = buttons[:-1] + switch_button
 
     return text, buttons
 
 
-def article_builder(event, method):
+async def article_builder(event, method):
     media = thumb = photo = None
     link_preview = False
     builder = event.builder
@@ -103,11 +102,24 @@ def article_builder(event, method):
     description = "Button menu for CatUserbot"
     if method == "help":
         help_info = main_menu()
-        title = "© CatUserbot Help"
+        title = "Help Menu"
         description = "Help menu for CatUserbot"
         thumb = get_thumb("help")
         query = help_info[0]
         buttons = help_info[1]
+
+    elif method == "deploy":
+        media = "https://github.com/TgCatUB/CatUserbot-Resources/raw/master/Resources/Inline/catlogo.png"
+        title = "𝘾𝙖𝙩𝙐𝙨𝙚𝙧𝙗𝙤𝙩"
+        description = "Deploy yourself"
+        query = "𝗗𝗲𝗽𝗹𝗼𝘆 𝘆𝗼𝘂𝗿 𝗼𝘄𝗻 𝗖𝗮𝘁𝗨𝘀𝗲𝗿𝗯𝗼𝘁."
+        buttons = [
+            (
+                Button.url("Source code", "https://github.com/TgCatUB/catuserbot"),
+                Button.url("Deploy", "https://github.com/TgCatUB/nekopack"),
+            )
+        ]
+
     elif method == "pmpermit":
         query = gvarstatus("pmpermit_text")
         buttons = [Button.inline(text="Show Options.", data="show_pmpermit_options")]
@@ -116,7 +128,9 @@ def article_builder(event, method):
             CAT = [x for x in PM_PIC.split()]
             PIC = list(CAT)
             media = random.choice(PIC)
+
     elif method == "ialive":
+        thumb = get_thumb("alive")
         buttons = [
             (
                 Button.inline("Stats", data="stats"),
@@ -141,6 +155,47 @@ def article_builder(event, method):
             CAT = [x for x in ALIVE_PIC.split()]
             PIC = list(CAT)
             media = random.choice(PIC)
+
+    elif method == "spotify":
+        try:
+            from userbot.plugins.spotify import SP_DATABASE, get_spotify, sp_data
+
+            title = "Spotify"
+            description = "Get currently playing song"
+            media = "https://github.com/TgCatUB/CatUserbot-Resources/raw/master/Resources/Inline/spotify_off.png"
+            if (
+                not (Config.SPOTIFY_CLIENT_ID and Config.SPOTIFY_CLIENT_SECRET)
+                or SP_DATABASE is None
+            ):
+                query = "__Spotify not setup properly. \nDo `.help spsetup` and follow the tutorial.__"
+                buttons = [
+                    Button.url(
+                        "Tutorial",
+                        "https://telegra.ph/Steps-of-setting-Spotify-Vars-in-Catuserbot-04-24-2",
+                    )
+                ]
+            else:
+                response = sp_data(
+                    "https://api.spotify.com/v1/me/player/currently-playing"
+                )
+                if response.status_code == 204:
+                    query = "__Currently not listening any music on spotify...__"
+                    buttons = [Button.url("Open Spotify", "https://open.spotify.com/")]
+                else:
+                    media, tittle, dic, lyrics, symbol = await get_spotify(
+                        event, response
+                    )
+                    thumb = get_thumb("spotify_on")
+                    query = f'**🎶 Track :- ** `{tittle}`\n**🎤 Artist :- ** `{dic["interpret"]}`'
+                    buttons = [
+                        (
+                            Button.url("🎧 Spotify", dic["link"]),
+                            Button.url(f"{symbol} Lyrics", lyrics),
+                        )
+                    ]
+        except:
+            return None
+
     elif method.startswith("Inline buttons"):
         markdown_note = method[14:]
         prev = 0
@@ -175,6 +230,7 @@ def article_builder(event, method):
         result = builder.document(
             media,
             title=title,
+            thumb=thumb,
             description=description,
             text=query,
             buttons=buttons,
@@ -345,10 +401,10 @@ async def inline_handler(event):  # sourcery no-metrics
         hid = re.compile("hide (.*)")
         match3 = re.findall(hid, query)
         if string == "ialive":
-            result = article_builder(event, string)
+            result = await article_builder(event, string)
             await event.answer([result] if result else None)
         elif query.startswith("Inline buttons"):
-            result = article_builder(event, query)
+            result = await article_builder(event, query)
             await event.answer([result] if result else None)
         elif match:
             query = query[7:]
@@ -474,7 +530,10 @@ async def inline_handler(event):  # sourcery no-metrics
             else:
                 json.dump(newhide, open(hide, "w"))
         elif string == "help":
-            result = article_builder(event, string)
+            result = await article_builder(event, string)
+            await event.answer([result] if result else None)
+        elif string == "spotify":
+            result = await article_builder(event, string)
             await event.answer([result] if result else None)
         elif str_y[0].lower() == "ytdl" and len(str_y) == 2:
             link = get_yt_video_id(str_y[1].strip())
@@ -571,14 +630,16 @@ async def inline_handler(event):  # sourcery no-metrics
             )
             await event.answer([result] if result else None)
         elif string == "pmpermit":
-            result = article_builder(event, string)
+            result = await article_builder(event, string)
             await event.answer([result] if result else None)
         elif string == "":
             results = []
-            alive_menu = article_builder(event, "ialive")
+            alive_menu = await article_builder(event, "ialive")
             results.append(alive_menu) if alive_menu else None
-            help_menu = article_builder(event, "help")
+            help_menu = await article_builder(event, "help")
             results.append(help_menu) if help_menu else None
+            spotify_menu = await article_builder(event, "spotify")
+            results.append(spotify_menu) if spotify_menu else None
             results.append(
                 builder.article(
                     title="Secret",
@@ -632,36 +693,8 @@ async def inline_handler(event):  # sourcery no-metrics
                 ),
             )
             await event.answer(results)
-
     else:
-        buttons = [
-            (
-                Button.url("Source code", "https://github.com/TgCatUB/catuserbot"),
-                Button.url(
-                    "Deploy",
-                    "https://github.com/TgCatUB/nekopack",
-                ),
-            )
-        ]
-        markup = event.client.build_reply_markup(buttons)
-        photo = types.InputWebDocument(
-            url=CATLOGO, size=0, mime_type="image/jpeg", attributes=[]
-        )
-        text, msg_entities = await event.client._parse_message_text(
-            "𝗗𝗲𝗽𝗹𝗼𝘆 𝘆𝗼𝘂𝗿 𝗼𝘄𝗻 𝗖𝗮𝘁𝗨𝘀𝗲𝗿𝗯𝗼𝘁.", "md"
-        )
-        result = types.InputBotInlineResult(
-            id=str(uuid4()),
-            type="photo",
-            title="𝘾𝙖𝙩𝙐𝙨𝙚𝙧𝙗𝙤𝙩",
-            description="Deploy yourself",
-            url="https://github.com/TgCatUB/catuserbot",
-            thumb=photo,
-            content=photo,
-            send_message=types.InputBotInlineMessageMediaAuto(
-                reply_markup=markup, message=text, entities=msg_entities
-            ),
-        )
+        result = await article_builder(event, "deploy")
         await event.answer([result] if result else None)
 
 

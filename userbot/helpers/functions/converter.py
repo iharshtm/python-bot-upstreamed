@@ -85,7 +85,7 @@ class CatConverter:
         return response[0], None
 
     async def to_webm(
-        self, event, reply, dirct="./", file="animate.webm", noedits=False
+        self, event, reply, dirct="./temp", file="animate.webm", noedits=False
     ):
         # //Hope u dunt kang :/ @Jisan7509
         memetype = await meme_type(reply)
@@ -116,7 +116,7 @@ class CatConverter:
         return catevent, None
 
     async def to_gif(
-        self, event, reply, dirct="./temp", file="meme.mp4", noedits=False
+        self, event, reply, dirct="./temp", file="meme.mp4", maxsize="5M", noedits=False
     ):
         memetype = await meme_type(reply)
         mediatype = await media_type(reply)
@@ -141,10 +141,12 @@ class CatConverter:
                 await runcmd(f"ffmpeg -i '{catmedia}' -c copy '{catfile}'")
             elif memetype == "Animated Sticker":
                 await runcmd(f"lottie_convert.py '{catmedia}' '{catfile}'")
-        elif mediatype == "Gif":
-            await runcmd(f"mv '{catmedia}' '{catfile}'")
+        if catmedia.endswith(".gif"):
+            await runcmd(f"ffmpeg -f gif -i '{catmedia}' -fs {maxsize} -an '{catfile}'")
         else:
-            await runcmd(f"ffmpeg -i '{catmedia}' -c:v libx264 -fs 5M -an '{catfile}'")
+            await runcmd(
+                f"ffmpeg -i '{catmedia}' -c:v libx264 -fs {maxsize} -an '{catfile}'"
+            )
         if catmedia and os.path.exists(catmedia):
             os.remove(catmedia)
         if os.path.exists(catfile):

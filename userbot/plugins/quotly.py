@@ -83,7 +83,9 @@ async def q_pic(event):  # sourcery no-metrics  # sourcery skip: low-code-qualit
         user = reply.sender_id if reply else event.client.uid
         pfp = await event.client.download_profile_photo(user)
     else:
-        imag = await Convert.to_image(event, reply, noedits=True)
+        imag = await Convert.to_image(
+            event, reply, dirct="./temp", file="quotly.png", noedits=True
+        )
         if imag[1] is None:
             return await edit_delete(
                 imag[0], "__Unable to extract image from the replied message.__"
@@ -220,7 +222,9 @@ async def stickerchat(catquotes):
         return
     outfi = os.path.join("./temp", "sticker.png")
     catmsg.save(outfi)
-    endfi = await Convert.to_sticker(catquotes, outfi, noedits=True)
+    endfi = await Convert.to_sticker(
+        catquotes, outfi, file="stickerchat.webp", noedits=True
+    )
     await catquotes.client.send_file(catquotes.chat_id, endfi[1], reply_to=reply)
     await catevent.delete()
     os.remove(endfi[1])
