@@ -130,7 +130,7 @@ async def article_builder(event, method):
             media = random.choice(PIC)
 
     elif method == "ialive":
-        thumb = get_thumb("alive")
+        #thumb = get_thumb("alive")
         buttons = [
             (
                 Button.inline("Stats", data="stats"),
@@ -162,6 +162,7 @@ async def article_builder(event, method):
 
             title = "Spotify"
             description = "Get currently playing song"
+            thumb = get_thumb("spotify_off")
             media = "https://github.com/TgCatUB/CatUserbot-Resources/raw/master/Resources/Inline/spotify_off.png"
             if (
                 not (Config.SPOTIFY_CLIENT_ID and Config.SPOTIFY_CLIENT_SECRET)
@@ -230,7 +231,7 @@ async def article_builder(event, method):
         result = builder.document(
             media,
             title=title,
-            thumb=thumb,
+            #thumb=thumb,
             description=description,
             text=query,
             buttons=buttons,
@@ -248,7 +249,7 @@ async def article_builder(event, method):
             type=type,
             file=media,
             thumb=thumb if thumb else photo,
-            content=photo,
+            content=thumb,
             text=query,
             buttons=buttons,
             link_preview=link_preview,
