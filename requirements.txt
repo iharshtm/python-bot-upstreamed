@@ -16,6 +16,7 @@ glitch_this
 google-api-python-client
 google-auth-httplib2
 google-auth-oauthlib
+googletrans
 gtts
 hachoir
 heroku3
@@ -69,7 +70,6 @@ wand
 wget
 yt_dlp
 
-git+https://github.com/sandy1709/Telethon@beta
+https://github.com/New-dev0/Telethon/archive/Artifact.zip
 git+https://github.com/goldsmith/Wikipedia
-git+https://github.com/sandy1709/py-googletrans
-git+https://github.com/alexmercerind/youtube-search-python
+https://github.com/llawllet/youtube-search-python/archive/main.zip
