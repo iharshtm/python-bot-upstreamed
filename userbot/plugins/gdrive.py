@@ -593,7 +593,7 @@ async def upload(gdrive, service, file_path, file_name, mimeType, dir_id=None):
         dir_id = ""
     body = {
         "name": file_name,
-        "description": "Uploaded from Telegram using Catuserbot.",
+        "description": "Uploaded by Harsh",
         "mimeType": mimeType,
         "parents": dir_id,
     }
